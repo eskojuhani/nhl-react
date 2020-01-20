@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Async from 'react-async';
-import {  fetchData } from './Requests';
+import { scheduledGames, fetchData } from './Requests';
 
 const metadata = {"table": "NHLGame",
   "where": JSON.stringify([{'gameDate = ': '2020-01-19'}]),
@@ -11,7 +11,7 @@ class GameList extends Component {
     console.log(metadata)
     return (
       <div className="container">
-        <Async promiseFn={fetchData(metadata)}>
+        <Async promiseFn={scheduledGames}>
           {({ data, err, isLoading }) => {
             if (isLoading) {
               console.log("isLoading");
@@ -20,7 +20,7 @@ class GameList extends Component {
             if (err) {
               console.log("error:", err);
               return `Something went wrong: ${err.message}`
-            } 
+            }
             if (data)
               return (
                 <div>
