@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 import GameList from './components/GameList';
-import UserList from './components/UserList';
 
 class App extends Component {
   render() {
@@ -12,7 +11,6 @@ class App extends Component {
         </header>
         <div className="App-intro">
           <GameList gameDate={"2020-01-19"} />
-          <UserList />
         </div>
       </div>
     );

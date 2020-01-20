@@ -1,42 +1,33 @@
 import React, { Component } from 'react';
 import Async from 'react-async';
-import { scheduledGames, fetchData } from './Requests';
-
-const metadata = {"table": "NHLGame",
-  "where": JSON.stringify([{'gameDate = ': '2020-01-19'}]),
-  "order": "gamePk"};
+import { fetchData } from './Requests';
 
 class GameList extends Component {
   render() {
-    console.log(metadata)
+    const metadata = {"table": "NHLGame",
+      "where": JSON.stringify([{'gameDate = ': this.props.gameDate}]),
+      "order": "gamePk"};
+
     return (
       <div className="container">
-        <Async promiseFn={scheduledGames}>
-          {({ data, err, isLoading }) => {
-            if (isLoading) {
-              console.log("isLoading");
-              return "Loading..."
-            }
-            if (err) {
-              console.log("error:", err);
-              return `Something went wrong: ${err.message}`
-            }
-            if (data)
-              return (
-                <div>
-                  <div>
-                    <h2>React Async - Scheduled Games</h2>
+        <Async promiseFn={fetchData} headers={metadata}>
+          <Async.Loading>Loading...</Async.Loading>
+
+          <Async.Resolved>
+            {data => (
+              <div className="gameList">
+                {data.map((el, index) => (
+                  <div key={index} className="row">
+                    {el.homeTeamName} vs {el.awayTeamName}
                   </div>
-                  {data.map(game => (
-                    <div key={game.gamePk} className="row">
-                      <div className="col-md-12">
-                        <p>{game.homeTeamName} vs  {game.awayTeamName}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )
-          }}
+                ))}
+              </div>
+            )}
+          </Async.Resolved>
+
+          <Async.Rejected>
+            {error => `Something went wrong: ${error.message}`}
+          </Async.Rejected>
         </Async>
       </div>
     )
