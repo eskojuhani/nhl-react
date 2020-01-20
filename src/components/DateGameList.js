@@ -2,20 +2,40 @@ import React, { Component } from 'react';
 import axios from 'axios';
 
 
-class DateGames extends Component {
-  state = {
-    data: [],
-    error: '',
-    gameDate: '2020-01-19'
-  };
+class DateGameList extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      data: [],
+      gameDate: this.props.gameDate,
+      metadata: {"table": "NHLGame",
+        "where": JSON.stringify([{'gameDate = ': this.props.gameDate}]),
+        "order": "gamePk"}
+    };
+    this.fetchData();
+  }
 
-  componentDidMount() {
+  componentDidUpdate(prevProps) {
+    if (prevProps.gameDate !== this.props.gameDate) {
+      console.log("changed")
+      this.setState({
+        data: [],
+        error: null,
+        gameDate: this.props.gameDate,
+        metadata: {"table": "NHLGame",
+          "where": JSON.stringify([{'gameDate = ': this.props.gameDate}]),
+          "order": "gamePk"}
+      });
+      this.fetchData();
+    }
+  }
+  fetchData() {
     const metadata = {"table": "NHLGame",
       "where": JSON.stringify([{'gameDate = ': this.state.gameDate}]),
       "order": "gamePk"};
 
     axios
-      .get('http://localhost:8008/api/table', {
+      .get('https://nhl-data.herokuapp.com/api/table', {
         headers: metadata
         })
       .then(res => this.setState({ data: res.data }))
@@ -24,22 +44,24 @@ class DateGames extends Component {
 
   render() {
     return (
-      <div className="container">
         <div>
-          <h2>React Async - User list</h2>
-        </div>
-        <div className="userlist">
-           {this.state.data.map(game => (
-             <div key={game.gamePk} className="row">
-               <div className="col-md-12">
-                 <p>{game.homeTeamName} vs {game.awayTeamName}</p>
+           {this.state.data.map((game, index) => (
+             <div className="entity-box" key={game.gamePk}>
+               <div className="field-date">{new Date(game.gameDate).toISOString().slice(0,10)}</div>
+               <div className="field-name">{game.homeTeamName}</div>
+               <div className="field-name">vs</div>
+               <div className="field-name">{game.awayTeamName}</div>
+               <div className="game.homeGameInfo">
+                 <span>{game.homeGameInfo}</span>
+               </div>
+               <div className="game.awayGameInfo">
+                 <span>{game.awayGameInfo}</span>
                </div>
              </div>
            ))}
          </div>
-       </div>
       )
   }
 }
 
-export default DateGames;
+export default DateGameList;
