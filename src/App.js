@@ -22,14 +22,13 @@ class App extends Component {
   }*/
 
   setDate(change) {
-    console.log("setDate", this.state.selectedDate, change);
     var d = new Date(this.state.selectedDate);
     d.setDate(d.getDate() + change);
     this.setState({
       selectedDate: d,
       searchTerm: d.toISOString().slice(0,10)
     });
-    return d.toISOString().slice(0,10);
+
   }
 
   render() {

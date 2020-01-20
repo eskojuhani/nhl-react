@@ -17,7 +17,6 @@ class DateGameList extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.gameDate !== this.props.gameDate) {
-      console.log("changed")
       this.setState({
         data: [],
         error: null,
@@ -25,8 +24,7 @@ class DateGameList extends Component {
         metadata: {"table": "NHLGame",
           "where": JSON.stringify([{'gameDate = ': this.props.gameDate}]),
           "order": "gamePk"}
-      });
-      this.fetchData();
+      }, this.fetchData);
     }
   }
   fetchData() {
@@ -38,7 +36,9 @@ class DateGameList extends Component {
       .get('https://nhl-data.herokuapp.com/api/table', {
         headers: metadata
         })
-      .then(res => this.setState({ data: res.data }))
+      .then(res => {
+        this.setState({ data: res.data })
+      })
       .catch(error => this.setState({ error }));
   }
 
