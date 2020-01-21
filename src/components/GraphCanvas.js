@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
+import _ from 'underscore';
 
 class GraphCanvas extends Component {
   constructor(props) {
     super(props);
+    this.onResize = this.onResize.bind(this);
     this.state = {
       gamekey: null,
       game: {}, //{homeTeamName: "alfa", awayTeamName: "beta"},
@@ -15,8 +17,8 @@ class GraphCanvas extends Component {
   }
 
   componentDidMount() {
-    //window.addEventListener('resize', this.onResize)
-    //window.dispatchEvent(new Event('resize'))
+    window.addEventListener('resize', this.onResize)
+    window.dispatchEvent(new Event('resize'))
     this.updateCanvas();
   }
 
@@ -50,17 +52,15 @@ class GraphCanvas extends Component {
   }
 
   onResize(event) {
-    console.log("GraphCanvas.onResize:", event.target.innerWidth);
-
     this.initCanvas(event.target.innerWidth * 0.9, event.target.innerHeight * 0.5);
 
-    if (this.state.game && this.state.game.length) {
+    if (this.state.game && !_.isEmpty(this.state.game)) {
       this.drawHeader(this.state.game);
     }
-    if (this.state.home) {
+    if (this.state.home && this.state.home.length) {
       this.drawGraphs(this.home, '#ff0000', 1);
     }
-    if (this.state.away) {
+    if (this.state.away && this.state.away.length) {
       this.drawGraphs(this.away, '#0000ff', 0);
     }
   }
@@ -71,20 +71,18 @@ class GraphCanvas extends Component {
     //this.cx.clearRect(0,0, this.canvas.width, this.canvas.height);
 
     this.initCanvas()
-    if (this.state.game && this.state.game.length) {
+    if (this.state.game && !_.isEmpty(this.state.game)) {
       this.drawHeader(this.state.game);
     }
-    if (this.state.home) {
+    if (this.state.home && this.state.home.length) {
       this.drawGraphs(this.home, '#ff0000', 1);
     }
-    if (this.state.away) {
+    if (this.state.away && this.state.away.length) {
       this.drawGraphs(this.away, '#0000ff', 0);
     }
   }
 
   initCanvas(width = 0, height = 0) {
-    console.log("GraphCanvas.initCanvas", width, height);
-
     if (this.canvas === undefined) {
       this.canvas = document.getElementById('canvas')
       this.cx = this.canvas.getContext('2d');
@@ -136,20 +134,22 @@ class GraphCanvas extends Component {
     }
   }
 
-  drawGraphs(data, color, isHome) {
+  drawGraphs(inData, color, isHome) {
+    let data = inData.slice(0, 80)
+    let row_fix = inData.length -  data.length;
     if (this.cx && this.rect && data) {
       var height = this.rect.height;
       var v_len = height / 100;
       var h_len = this.rect.width / (data.length + 1);
 
-      this.drawMovingAvg(data, "gameMovingAvg3", color, true);
-      this.drawMovingAvg(data, "gameMovingAvg10", color, false);
-      this.drawLocation(data, isHome);
+      this.drawMovingAvg(data, "gameMovingAvg3", color, true, row_fix);
+      this.drawMovingAvg(data, "gameMovingAvg10", color, false, row_fix);
+      this.drawLocation(data, isHome, row_fix);
 
       this.cx.lineWidth = 1;
       for (var i = 0; i < data.length; i++) {
         var item = data[i];
-        var centerX = h_len * item.row_num;
+        var centerX = h_len * (item.row_num - row_fix);
         var centerY = height - (item.performance * v_len);
         if (item.overtime === 1) {
           this.cx.beginPath();
@@ -177,7 +177,7 @@ class GraphCanvas extends Component {
     }
   }
 
-  drawMovingAvg(data, column, color, isDash) {
+  drawMovingAvg(data, column, color, isDash, row_fix) {
     var height = this.rect.height;
     var v_len = height / 100;
     var h_len = this.rect.width / (data.length + 1);
@@ -209,8 +209,8 @@ class GraphCanvas extends Component {
       else
         this.cx.lineWidth = 1;
 
-      this.cx.moveTo(h_len * start.row_num, height - (start[column] * v_len));
-      this.cx.lineTo(h_len * end.row_num, height - (end[column] * v_len));
+      this.cx.moveTo(h_len * (start.row_num - row_fix), height - (start[column] * v_len));
+      this.cx.lineTo(h_len * (end.row_num - row_fix), height - (end[column] * v_len));
 
       this.cx.stroke();
     }
@@ -224,7 +224,7 @@ class GraphCanvas extends Component {
     return Math.ceil(timeDiff / (1000 * 3600 * 24));
   }
 
-  drawLocation(data, isHome) {
+  drawLocation(data, isHome, row_fix) {
     //var height = this.rect.height;
     var y = this.rect.height - ((isHome === 1) ? 20 : 10);
     var h_len = this.rect.width / (data.length + 1);
@@ -256,16 +256,16 @@ class GraphCanvas extends Component {
       else
         this.cx.strokeStyle = '#1111ff'
 
-      this.cx.moveTo(h_len * item.row_num, y);
-      this.cx.lineTo(h_len * item.row_num - h_len + (h_len / 3), y);
-      var lineLen = (h_len * item.row_num) - (h_len * item.row_num - h_len + (h_len / 3));
+      this.cx.moveTo(h_len * (item.row_num - row_fix), y);
+      this.cx.lineTo(h_len * (item.row_num - row_fix) - h_len + (h_len / 3), y);
+      var lineLen = (h_len * (item.row_num - row_fix)) - (h_len * (item.row_num - row_fix) - h_len + (h_len / 3));
       this.cx.stroke();
       if (item.outcome === "W") {
         this.cx.save();
         this.cx.beginPath();
         this.cx.strokeStyle = '#000';
         this.cx.fillStyle = '#000';
-        this.cx.fillRect(h_len * item.row_num - 3, y - 3, 6, 6);
+        this.cx.fillRect(h_len * (item.row_num - row_fix) - 3, y - 3, 6, 6);
         this.cx.fill();
         this.cx.stroke();
         this.cx.restore();
@@ -278,7 +278,7 @@ class GraphCanvas extends Component {
         this.cx.fillStyle = '#000';
         var j = 0
         for (j = 1; j <= lineCaps; j++) {
-          this.cx.fillRect(h_len * item.row_num - lineLen + (lineCap * j) - 1, y - 4, 2, 8);
+          this.cx.fillRect(h_len * (item.row_num - row_fix) - lineLen + (lineCap * j) - 1, y - 4, 2, 8);
           this.cx.fill();
         }
         this.cx.stroke();

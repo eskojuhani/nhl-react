@@ -11,9 +11,7 @@ class GamePerformance extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    console.log("GamePerformance.componentDidUpdate:", this.props)
     if (prevProps.teamName !== this.props.teamName) {
-      console.log("GamePerformance.componentDidUpdate data:", this.props.data)
 
       this.setState({
         data: this.props.data,

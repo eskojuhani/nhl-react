@@ -4,6 +4,7 @@ import DateGameList from './components/DateGameList';
 import GraphCanvas from './components/GraphCanvas';
 import GamePerformance from './components/GamePerformance';
 import { fetchPerformance } from './components/api.service';
+import { _ } from 'underscore';
 
 class App extends Component {
   constructor(props) {
@@ -30,7 +31,6 @@ class App extends Component {
   }
 
   gameSelected(game) {
-    console.log("gameSelected", game, this);
     this.setState({
       selectedGame: game,
       homePerformance: [],
@@ -109,20 +109,24 @@ class App extends Component {
   render() {
     //selectedDate.setUTCHours(0, 0, 0, 0);
     let graphCanvas;
-    if (this.state.selectedGame) {
-      graphCanvas= <GraphCanvas game={this.state.selectedGame} home={this.state.homePerformance} away={this.state.awayPerformance} />;
+    if (this.state.selectedGame && !_.isEmpty(this.state.selectedGame)) {
+      graphCanvas =
+        <div className="entity-section entity-section-dark">
+          <div className="container">
+            <div className="row row-centered">
+              <GraphCanvas game={this.state.selectedGame} home={this.state.homePerformance} away={this.state.awayPerformance} />
+            </div>
+          </div>
+        </div>
     }
     else {
-      graphCanvas = {/* A JSX comment */}
+      graphCanvas = <span></span>
     }
 
     let gamePerformances;
     if (this.state.selectedGame && this.state.homePerformance && this.state.homePerformance.length &&
       this.state.awayPerformance && this.state.awayPerformance.length) {
       gamePerformances = this.getGamePerformances();
-    }
-    else {
-      console.log("gamePerformances not avail.")
     }
 
     return (
@@ -148,13 +152,7 @@ class App extends Component {
             </div>
           </div>
         </div>
-        <div className="entity-section entity-section-dark">
-          <div className="container">
-            <div className="row row-centered">
-              { graphCanvas }
-            </div>
-          </div>
-        </div>
+        { graphCanvas }
         <div className="entity-section entity-section-light">
           { gamePerformances }
         </div>
