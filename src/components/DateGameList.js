@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-
+import { _ } from 'underscore';
 
 class DateGameList extends Component {
   constructor(props) {
@@ -37,16 +37,19 @@ class DateGameList extends Component {
         headers: metadata
         })
       .then(res => {
-        this.setState({ data: res.data })
+        this.setState({ data: _.uniq(res.data, "gamePk") })
       })
       .catch(error => this.setState({ error }));
   }
 
+  gameSelected(game, event) {
+    this.props.onClick(game);
+  }
   render() {
     return (
         <div>
            {this.state.data.map((game, index) => (
-             <div className="entity-box" key={game.gamePk}>
+             <div className="entity-box" key={game.gamePk} onClick={this.gameSelected.bind(this, game)}>
                <div className="field-date">{new Date(game.gameDate).toISOString().slice(0,10)}</div>
                <div className="field-name">{game.homeTeamName}</div>
                <div className="field-name">vs</div>

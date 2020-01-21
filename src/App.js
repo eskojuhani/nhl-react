@@ -1,25 +1,59 @@
 import React, { Component } from 'react';
 import './App.css';
 import DateGameList from './components/DateGameList';
+import GraphCanvas from './components/GraphCanvas';
+import GamePerformance from './components/GamePerformance';
+import { fetchPerformance } from './components/api.service';
 
 class App extends Component {
   constructor(props) {
     super(props);
+
+    this.gameSelected = this.gameSelected.bind(this);
+
     this.state = {
+      isLoggedIn: false,
+      selectedGame: {},
+      homePerformance: [],
+      awayPerformance: [],
       selectedDate: new Date(),
       searchTerm: new Date().toISOString().slice(0,10)
     };
   }
-  /*
-  static getDerivedStateFromProps(nextProps, prevState) {
-    console.log("getDerivedStateFromProps", nextProps);
-    if (nextProps.searchTerm !== prevState.searchTerm) {
-      return {
-        searchTerm: nextProps.searchTerm
-      };
-    }
-    return null;
-  }*/
+
+  handleLoginClick() {
+    this.setState({isLoggedIn: true});
+  }
+
+  handleLogoutClick() {
+    this.setState({isLoggedIn: false});
+  }
+
+  gameSelected(game) {
+    console.log("gameSelected", game, this);
+    this.setState({
+      selectedGame: game,
+      homePerformance: [],
+      awayPerformance: []
+    });
+
+    fetchPerformance(game.homeTeamName, this.state.selectedDate)
+      .then(data => {
+        this.setState({
+          homePerformance: data
+        });
+      })
+      .catch(err => console.log('There was an error:' + err))
+
+      fetchPerformance(game.awayTeamName, this.state.selectedDate)
+        .then(data => {
+          this.setState({
+            awayPerformance: data
+          });
+        })
+        .catch(err => console.log('There was an error:' + err))
+
+  }
 
   setDate(change) {
     var d = new Date(this.state.selectedDate);
@@ -28,16 +62,73 @@ class App extends Component {
       selectedDate: d,
       searchTerm: d.toISOString().slice(0,10)
     });
-
   }
 
+  getGamePerformances() {
+    let homePerformance;
+    if (this.state.homePerformance) {
+      homePerformance= <GamePerformance teamName={this.state.selectedGame.homeTeamName} data={this.state.homePerformance}  />;
+    }
+    else {
+      homePerformance = {/* A JSX comment */}
+    }
+    let awayPerformance;
+    if (this.state.awayPerformance) {
+      awayPerformance= <GamePerformance teamName={this.state.selectedGame.awayTeamName} data={this.state.awayPerformance}  />;
+    }
+    else {
+      awayPerformance = {/* A JSX comment */}
+    }
+
+    return (
+      <div className="container">
+        <div className="row row-centered">
+          <div className="column-header">
+              Performances
+          </div>
+        </div>
+        <div className="row row-centered">
+          <div className="col-md-6">
+            <div>{ this.state.selectedGame.homeTeamName }</div>
+          </div>
+          <div className="col-md-6">
+            <div>{ this.state.selectedGame.awayTeamName }</div>
+          </div>
+        </div>
+        <div className="row row-centered">
+          <div className="col-md-6">
+            { homePerformance }
+          </div>
+          <div className="col-md-6">
+            { awayPerformance }
+          </div>
+        </div>
+      </div>
+    )
+  }
   render() {
     //selectedDate.setUTCHours(0, 0, 0, 0);
+    let graphCanvas;
+    if (this.state.selectedGame) {
+      graphCanvas= <GraphCanvas game={this.state.selectedGame} home={this.state.homePerformance} away={this.state.awayPerformance} />;
+    }
+    else {
+      graphCanvas = {/* A JSX comment */}
+    }
+
+    let gamePerformances;
+    if (this.state.selectedGame && this.state.homePerformance && this.state.homePerformance.length &&
+      this.state.awayPerformance && this.state.awayPerformance.length) {
+      gamePerformances = this.getGamePerformances();
+    }
+    else {
+      console.log("gamePerformances not avail.")
+    }
 
     return (
       <div className="App">
         <div className="entity-section entity-section-light">
-          <div className="container" key="a1">
+          <div className="container">
             <div className="row row-centered">
               <div className="column-header">
                 <h1>NHL - React</h1>
@@ -52,10 +143,20 @@ class App extends Component {
             </div>
             <div className="row row-centered">
               <div className="col-md-12">
-                <DateGameList gameDate={ this.state.searchTerm } />
+                <DateGameList onClick={this.gameSelected} gameDate={ this.state.searchTerm } />
               </div>
             </div>
           </div>
+        </div>
+        <div className="entity-section entity-section-dark">
+          <div className="container">
+            <div className="row row-centered">
+              { graphCanvas }
+            </div>
+          </div>
+        </div>
+        <div className="entity-section entity-section-light">
+          { gamePerformances }
         </div>
       </div>
     );
