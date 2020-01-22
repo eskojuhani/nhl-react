@@ -20,7 +20,6 @@ class DateGameList extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.gameDate !== this.props.gameDate) {
-      console.log("DateGameList.componentDidUpdate gameDate:", this.state.gameDate)
       this.setState({
         data: [],
         error: null,

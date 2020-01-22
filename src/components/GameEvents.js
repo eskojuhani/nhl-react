@@ -32,7 +32,6 @@ class GameEvents extends Component {
         headers: metadata
         })
       .then(res => {
-        console.log(res.data)
         this.setState({ data: res.data })
       })
       .catch(error => this.setState({ error }));
