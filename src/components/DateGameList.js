@@ -7,6 +7,9 @@ class DateGameList extends Component {
     super(props);
     this.state = {
       data: [],
+      selectedGame: null,
+      homeGameInfo: null,
+      awayGameInfo: null,
       gameDate: this.props.gameDate,
       metadata: {"table": "NHLGame",
         "where": JSON.stringify([{'gameDate = ': this.props.gameDate}]),
@@ -17,14 +20,26 @@ class DateGameList extends Component {
 
   componentDidUpdate(prevProps) {
     if (prevProps.gameDate !== this.props.gameDate) {
+      console.log("DateGameList.componentDidUpdate gameDate:", this.state.gameDate)
       this.setState({
         data: [],
         error: null,
+        selectedGame: null,
         gameDate: this.props.gameDate,
         metadata: {"table": "NHLGame",
           "where": JSON.stringify([{'gameDate = ': this.props.gameDate}]),
           "order": "gamePk"}
       }, this.fetchData);
+    }
+    if (prevProps.homeGameInfo !== this.props.homeGameInfo) {
+      this.setState({
+        homeGameInfo: this.props.homeGameInfo
+      })
+    }
+    if (prevProps.awayGameInfo !== this.props.awayGameInfo) {
+      this.setState({
+        awayGameInfo: this.props.awayGameInfo
+      })
     }
   }
   fetchData() {
@@ -43,8 +58,21 @@ class DateGameList extends Component {
   }
 
   gameSelected(game, event) {
+    this.setState({
+      selectedGame: game
+    });
     this.props.onClick(game);
   }
+
+  updateGameInfo() {
+    console.log("DateGameList updateGameInfo selectedGame:", this.state.selectedGame)
+    var game = this.state.selectedGame;
+    game.homeGameInfo = "H2W";
+    this.setState({
+      selectedGame: game
+    });
+  }
+
   render() {
     return (
         <div>

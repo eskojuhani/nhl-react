@@ -30,6 +30,45 @@ class App extends Component {
     this.setState({isLoggedIn: false});
   }
 
+  daysBetween(date1, date2) {
+    var from = new Date(date1);
+    var to = new Date(date2);
+    var timeDiff = Math.abs(from.getTime() - to.getTime());
+    return Math.ceil(timeDiff / (1000 * 3600 * 24));
+  }
+
+  updateHomeInfo(newValue) {
+    if (this.state.selectedGame && newValue && newValue.length > 1) {
+       var preGame = newValue[0];
+       var days = this.daysBetween(this.state.selectedGame.gameDate, preGame.gameDate);
+
+       if (days > 0) {
+         var gameInfo = "H: " + preGame.location + (days-1) + preGame.outcome + ' ' + preGame.finalScore;
+         var game = this.state.selectedGame;
+         game.homeGameInfo = gameInfo
+         this.setState({
+           selectedGame : game
+         });
+         console.log("gameInfo:", gameInfo)
+       }
+     }
+  }
+  updateAwayInfo(newValue) {
+    if (this.state.selectedGame && newValue && newValue.length > 1) {
+       var preGame = newValue[0];
+       var days = this.daysBetween(this.state.selectedGame.gameDate, preGame.gameDate);
+
+       if (days > 0) {
+         var gameInfo = "A: " + preGame.location + (days-1) + preGame.outcome + ' ' + preGame.finalScore;
+         var game = this.state.selectedGame;
+         game.awayGameInfo = gameInfo
+         this.setState({
+           selectedGame : game
+         });
+         console.log("gameInfo:", gameInfo)
+       }
+     }
+  }
   gameSelected(game) {
     this.setState({
       selectedGame: game,
@@ -41,18 +80,17 @@ class App extends Component {
       .then(data => {
         this.setState({
           homePerformance: data
-        });
+        }, this.updateHomeInfo(data));
       })
       .catch(err => console.log('There was an error:' + err))
 
-      fetchPerformance(game.awayTeamName, this.state.selectedDate)
-        .then(data => {
-          this.setState({
-            awayPerformance: data
-          });
-        })
-        .catch(err => console.log('There was an error:' + err))
-
+    fetchPerformance(game.awayTeamName, this.state.selectedDate)
+      .then(data => {
+        this.setState({
+          awayPerformance: data
+        }, this.updateAwayInfo(data));
+      })
+      .catch(err => console.log('There was an error:' + err))
   }
 
   setDate(change) {
@@ -127,7 +165,14 @@ class App extends Component {
     if (this.state.selectedGame && this.state.homePerformance && this.state.homePerformance.length &&
       this.state.awayPerformance && this.state.awayPerformance.length) {
       gamePerformances = this.getGamePerformances();
+    }/*
+    if (this.state.homePerformance && this.state.homePerformance.length &&
+      this.state.awayPerformance && this.state.awayPerformance.length) {
+      homeGameInfo = this.getGamePerformances();
     }
+    if (this.state.awayPerformance && this.state.awayPerformance.length) {
+      awayGameInfo = this.getGamePerformances();
+    }*/
 
     return (
       <div className="App">
