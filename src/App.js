@@ -49,7 +49,6 @@ class App extends Component {
          this.setState({
            selectedGame : game
          });
-         console.log("gameInfo:", gameInfo)
        }
      }
   }
