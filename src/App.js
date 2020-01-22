@@ -3,6 +3,7 @@ import './App.css';
 import DateGameList from './components/DateGameList';
 import GraphCanvas from './components/GraphCanvas';
 import GamePerformance from './components/GamePerformance';
+import GameEvents from './components/GameEvents';
 import { fetchPerformance } from './components/api.service';
 import { _ } from 'underscore';
 
@@ -64,7 +65,6 @@ class App extends Component {
          this.setState({
            selectedGame : game
          });
-         console.log("gameInfo:", gameInfo)
        }
      }
   }
@@ -106,38 +106,34 @@ class App extends Component {
     if (this.state.homePerformance) {
       homePerformance= <GamePerformance teamName={this.state.selectedGame.homeTeamName} data={this.state.homePerformance}  />;
     }
-    else {
-      homePerformance = {/* A JSX comment */}
-    }
     let awayPerformance;
     if (this.state.awayPerformance) {
       awayPerformance= <GamePerformance teamName={this.state.selectedGame.awayTeamName} data={this.state.awayPerformance}  />;
     }
-    else {
-      awayPerformance = {/* A JSX comment */}
-    }
 
     return (
-      <div className="container">
-        <div className="row row-centered">
-          <div className="column-header">
-              Performances
+      <div className="entity-section entity-section-light">
+        <div className="container">
+          <div className="row row-centered">
+            <div className="column-header">
+                Performances
+            </div>
           </div>
-        </div>
-        <div className="row row-centered">
-          <div className="col-md-6">
-            <div>{ this.state.selectedGame.homeTeamName }</div>
+          <div className="row row-centered">
+            <div className="col-md-6">
+              <div>{ this.state.selectedGame.homeTeamName }</div>
+            </div>
+            <div className="col-md-6">
+              <div>{ this.state.selectedGame.awayTeamName }</div>
+            </div>
           </div>
-          <div className="col-md-6">
-            <div>{ this.state.selectedGame.awayTeamName }</div>
-          </div>
-        </div>
-        <div className="row row-centered">
-          <div className="col-md-6">
-            { homePerformance }
-          </div>
-          <div className="col-md-6">
-            { awayPerformance }
+          <div className="row row-centered">
+            <div className="col-md-6">
+              { homePerformance }
+            </div>
+            <div className="col-md-6">
+              { awayPerformance }
+            </div>
           </div>
         </div>
       </div>
@@ -156,15 +152,26 @@ class App extends Component {
           </div>
         </div>
     }
-    else {
-      graphCanvas = <span></span>
-    }
 
     let gamePerformances;
     if (this.state.selectedGame && this.state.homePerformance && this.state.homePerformance.length &&
       this.state.awayPerformance && this.state.awayPerformance.length) {
       gamePerformances = this.getGamePerformances();
-    }/*
+    }
+    let gameEvents;
+    if (this.state.selectedGame && !_.isEmpty(this.state.selectedGame)) {
+      gameEvents =
+        <div className="entity-section entity-section-light">
+          <div className="container">
+            <div className="row row-centered">
+              <div className="col-md-12">
+                <GameEvents game={this.state.selectedGame} />
+              </div>
+            </div>
+          </div>
+        </div>;
+    }
+    /*
     if (this.state.homePerformance && this.state.homePerformance.length &&
       this.state.awayPerformance && this.state.awayPerformance.length) {
       homeGameInfo = this.getGamePerformances();
@@ -197,9 +204,8 @@ class App extends Component {
           </div>
         </div>
         { graphCanvas }
-        <div className="entity-section entity-section-light">
-          { gamePerformances }
-        </div>
+        { gameEvents }
+        { gamePerformances }
       </div>
     );
   }
