@@ -58,10 +58,10 @@ class GraphCanvas extends Component {
       this.drawHeader(this.state.game);
     }
     if (this.state.home && this.state.home.length) {
-      this.drawGraphs(this.home, '#ff0000', 1);
+      this.drawGraphs(this.state.home, '#ff0000', 1);
     }
     if (this.state.away && this.state.away.length) {
-      this.drawGraphs(this.away, '#0000ff', 0);
+      this.drawGraphs(this.state.away, '#0000ff', 0);
     }
   }
 
@@ -75,10 +75,10 @@ class GraphCanvas extends Component {
       this.drawHeader(this.state.game);
     }
     if (this.state.home && this.state.home.length) {
-      this.drawGraphs(this.home, '#ff0000', 1);
+      this.drawGraphs(this.state.home, '#ff0000', 1);
     }
     if (this.state.away && this.state.away.length) {
-      this.drawGraphs(this.away, '#0000ff', 0);
+      this.drawGraphs(this.state.away, '#0000ff', 0);
     }
   }
 
