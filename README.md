@@ -24,4 +24,4 @@ Game events are processed and evaluated to points.
 
 
 
-![screenshot](https://github.com/eskojuhani/NHL-angular/screenshot.png?raw=true?raw=true "Screenshot")
+![screenshot](https://github.com/eskojuhani/NHL-angular/blob/master/screenshot.png?raw=true?raw=true "Screenshot")
