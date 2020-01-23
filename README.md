@@ -1,12 +1,12 @@
 # FrontEnd demo for NHL schedules/games etc
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.0.
+This project was generated with latest React.
 
 ## Development server
 
 Run `npm i` to install node components.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `yarn react-scripts start` for a dev server. Navigate to `http://localhost:3000/`. The app will automatically reload if you change any of the source files.
 
 Data is fetched from backend https://nhl-data.herokuapp.com.
 It's a node app.
